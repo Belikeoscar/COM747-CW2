@@ -1,4 +1,4 @@
-<b> Title: Predicting Stroke Risk Using Machine Learning on a Public Healthcare Dataset </b>
+***Title: Predicting Stroke Risk Using Machine Learning on a Public Healthcare Dataset***
 
 ##Abstract — We present a machine learning workflow to predict stroke occurrence using a publicly available healthcare dataset (n=5110). The dataset contains demographic, medical history, and lifestyle variables. We preprocess data (missing-value imputation, encoding), engineer features, and compare classification models: logistic regression, random forest, and XGBoost. A baseline logistic model achieved AUC = 0.844 and accuracy = 0.746 on a held-out test set. We discuss limitations, fairness and ethical considerations.
 
