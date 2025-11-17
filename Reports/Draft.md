@@ -17,7 +17,7 @@ Aim: Develop and evaluate ML models to predict stroke.
 
 Objectives: (1) data cleaning and exploratory analysis; (2) feature engineering; (3) model training, validation and selection; (4) discussion of ethical and fairness implications.
 
-##2. Methods
+## 2. Methods
 #Data source
 
 The dataset from kaggle (omo Ikechukwu run link here abeg) provided contains 5110 records and 12 variables: id, gender, age, hypertension, heart_disease, ever_married, work_type, Residence_type, avg_glucose_level, bmi, smoking_status, stroke. The target is stroke (binary). Prevalence in this dataset is 249/5110 (≈ 4.87%).
@@ -34,7 +34,7 @@ Data split: 80% train / 20% test with stratification on the target.
 
 We implemented logistic regression (balanced class weighting), random forest (ranger) and XGBoost. Training used stratified 5-fold cross-validation. Evaluation metrics: AUC, accuracy, confusion matrices. Models were compared on the held-out test set.
 
-##3. Results
+## 3. Results
 
 Dataset descriptive stats: mean age ≈ 43.23 years, median age ≈ 41 years. Gender distribution: (counts printed in lab book). BMI had 819 missing entries (imputed).
 
@@ -48,7 +48,7 @@ Confusion matrix (TN, FP; FN, TP) = [[722, 250], [10, 40]]
 
 Random Forest and XGBoost typically produced comparable or slightly better AUCs after tuning (see code & artifacts in repo for full tuning grid and final chosen hyperparameters).
 
-##4. Discussion
+## 4. Discussion
 Limitations
 
 Observational dataset — potential selection bias.
@@ -65,7 +65,7 @@ Avoid automated clinical decisions without clinician oversight.
 
 Consider fairness: check model performance across demographic groups (e.g., gender, age groups) to ensure equity.
 
-##5. Conclusion
+## 5. Conclusion
 
 Standard ML workflows achieved reasonable discrimination (AUC ≈ 0.84) for predicting stroke in the dataset. Further steps include calibration, external validation, model explainability (SHAP), and deployment considerations.
 
