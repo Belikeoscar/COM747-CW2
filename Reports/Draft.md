@@ -1,10 +1,10 @@
 ***Title: Predicting Stroke Risk Using Machine Learning on a Public Healthcare Dataset***
 
-##Abstract — We present a machine learning workflow to predict stroke occurrence using a publicly available healthcare dataset (n=5110). The dataset contains demographic, medical history, and lifestyle variables. We preprocess data (missing-value imputation, encoding), engineer features, and compare classification models: logistic regression, random forest, and XGBoost. A baseline logistic model achieved AUC = 0.844 and accuracy = 0.746 on a held-out test set. We discuss limitations, fairness and ethical considerations.
+## Abstract — We present a machine learning workflow to predict stroke occurrence using a publicly available healthcare dataset (n=5110). The dataset contains demographic, medical history, and lifestyle variables. We preprocess data (missing-value imputation, encoding), engineer features, and compare classification models: logistic regression, random forest, and XGBoost. A baseline logistic model achieved AUC = 0.844 and accuracy = 0.746 on a held-out test set. We discuss limitations, fairness and ethical considerations.
 
 #Keywords: stroke prediction, machine learning, logistic regression, random forest, XGBoost, CRISP-DM
 
-##1. Introduction
+## 1. Introduction
 
 Stroke is a leading cause of death and disability worldwide. Early identification of high-risk individuals allows targeted interventions. Prior studies have applied classical statistical models and modern machine learning (ML) methods to predict stroke using clinical and demographic features. This study aims to implement a full ML lifecycle (CRISP-DM), produce reproducible code, and evaluate model performance on a public dataset.
 
