@@ -1,0 +1,1 @@
+Contains the R scipt, we are working with "MainScript.R" the remaining scripts are drafts of different approaches but we decided to use main for specific reasons as discussed in the report
