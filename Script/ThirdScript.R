@@ -78,20 +78,33 @@ df <- df %>%
                             levels = c("child","young_adult","adult","senior")))
 
 # -----------------------------
-# 3. Train / Test split
+# 3. Train / Validation / Test split (70 / 15 / 15)
 # -----------------------------
-train_index <- createDataPartition(df$stroke, p = 0.8, list = FALSE)
-train <- df[train_index, ]
-test  <- df[-train_index, ]
+set.seed(42)
 
-cat("Train size:", nrow(train), " Test size:", nrow(test), "\n")
+# 70% train, 30% temp
+train_index <- createDataPartition(df$stroke, p = 0.7, list = FALSE)
+train <- df[train_index, ]
+temp  <- df[-train_index, ]
+
+# Split remaining 30% into 15% val, 15% test (50/50 of temp)
+temp_index <- createDataPartition(temp$stroke, p = 0.5, list = FALSE)
+validation <- temp[temp_index, ]
+test       <- temp[-temp_index, ]
+
+cat("Train size:", nrow(train),
+    " Validation size:", nrow(validation),
+    " Test size:", nrow(test), "\n")
+
 cat("Train class balance:\n")
 print(table(train$stroke))
+cat("Validation class balance:\n")
+print(table(validation$stroke))
 cat("Test class balance:\n")
 print(table(test$stroke))
 
 # -----------------------------
-# 4. Manual random oversampling (no SMOTE)
+# 4. Manual random oversampling (no SMOTE) on TRAIN only
 # -----------------------------
 oversample_minority <- function(data, target_col) {
   tbl <- table(data[[target_col]])
@@ -124,29 +137,37 @@ print(table(train_up$stroke))
 # -----------------------------
 num_vars <- c("age", "avg_glucose_level", "bmi")
 
+# Fit scaler on oversampled TRAIN
 prep_recipe <- preProcess(train_up[, num_vars],
                           method = c("center", "scale"))
 
 train_num <- predict(prep_recipe, train_up[, num_vars])
+valid_num <- predict(prep_recipe, validation[, num_vars])
 test_num  <- predict(prep_recipe, test[, num_vars])
 
+# Categorical dummies fitted on oversampled TRAIN
 dummies <- dummyVars(
   ~ gender + ever_married + work_type + Residence_type +
     smoking_status + hypertension + heart_disease + age_group,
   data = train_up
 )
 
-train_cat <- predict(dummies, newdata = train_up) %>% as.data.frame()
-test_cat  <- predict(dummies, newdata = test)    %>% as.data.frame()
+train_cat <- predict(dummies, newdata = train_up)    %>% as.data.frame()
+valid_cat <- predict(dummies, newdata = validation) %>% as.data.frame()
+test_cat  <- predict(dummies, newdata = test)       %>% as.data.frame()
 
 train_model <- bind_cols(train_num, train_cat) %>%
   mutate(stroke = train_up$stroke)
+
+valid_model <- bind_cols(valid_num, valid_cat) %>%
+  mutate(stroke = validation$stroke)
 
 test_model <- bind_cols(test_num, test_cat) %>%
   mutate(stroke = test$stroke)
 
 # Ensure Stroke is positive class (first level)
 train_model$stroke <- relevel(train_model$stroke, ref = "Stroke")
+valid_model$stroke <- relevel(valid_model$stroke, ref = "Stroke")
 test_model$stroke  <- relevel(test_model$stroke,  ref = "Stroke")
 
 # -----------------------------
@@ -214,7 +235,7 @@ gbm_fit <- train(
 print(gbm_fit)
 
 # -----------------------------
-# 8. Predictions & ROC/AUC
+# 8. Predictions & ROC/AUC (using TEST set)
 # -----------------------------
 glm_prob <- predict(glm_fit, newdata = test_model, type = "prob")[, "Stroke"]
 rf_prob  <- predict(rf_fit,  newdata = test_model, type = "prob")[, "Stroke"]
@@ -366,9 +387,10 @@ ggplot(df, aes(x = stroke, y = avg_glucose_level, fill = stroke)) +
 
 ## 10.7 Random Forest feature importance
 rf_varimp <- varImp(rf_fit)$importance %>%
-  rownames_to_column("Feature") %>%
-  arrange(desc(Overall)) %>%
-  slice(1:15)
+  as.data.frame() %>%
+  tibble::rownames_to_column("Feature") %>%
+  dplyr::arrange(dplyr::desc(Overall)) %>%
+  dplyr::slice(1:15)
 
 ggplot(rf_varimp, aes(x = reorder(Feature, Overall), y = Overall)) +
   geom_col() +
@@ -379,6 +401,7 @@ ggplot(rf_varimp, aes(x = reorder(Feature, Overall), y = Overall)) +
     y = "Importance"
   ) +
   theme_minimal()
+
 
 ## 10.8 ROC curves (all models)
 plot(roc_glm, col = 1, lwd = 2, main = "ROC Curves - All Models")
